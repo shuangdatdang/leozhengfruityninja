@@ -9,102 +9,60 @@ function drawStart() {
     ctx.fillText("CLICK TO START", 350, 285)
   
     ctx.font = "25px Consolas";
-    ctx.fillText("CLICK AND HOLD LEFT MOUSE BUTTON TO GO UP", 100, 450);
-    ctx.fillText("RELEASE TO GO DOWN", 415, 480);
+    ctx.fillText("Swipe Balls Before They Fall", 100, 450);
+    ctx.fillText("Watch Out For Red Balls", 415, 480);
   }
   
   // Draw Game Elements
   function runGame() {
-    
+    ctx.clearRect(0,0,cnv.width,cnv.height)
     //LOGIC
-    moveHeli();
-    moveWalls();
+
+      for (let i = 0; i < bubbles.length; i++){
+          moveBubble(bubbles[i]);
+          drawBubble(bubbles[i]);
+          bubbleClicked(bubbles[i]);
+          if (bubbles[i].y + bubbles[i].r  >= cnv.height - 50){
+              bubbles[i].y = cnv.height -bubbles[i].r - 50
+              bubbles[i].speed = bubbles[i].speed * -0.98
+          }
+          if (bubbles[i].y < -200){
+              bubbles[i].y = -199
+              bubbles[i].speed = bubbles[i].speed * -1
+          }
+          if (bubbles[i].x - bubbles[i].r < 0){
+              bubbles[i].x = bubbles[i].r
+              bubbles[i].speedX = bubbles[i].speedX * -1
+          } else if(bubbles[i].x + bubbles[i].r > cnv.width){
+              bubbles[i].x = cnv.width -bubbles[i].r
+              bubbles[i].speedX = bubbles[i].speedX * - 1
+          }
+      }
     //DRAW
     drawGame();
     checkCrash();
   }
-  function moveHeli(){
-    //accel up if mous is presses
 
-    if (mouseIsPressed){
-        heli.speed += -2;
-    }
-    // Apple Gravity (acecl)
-    heli.speed += heli.accel;
-
-    // max speed
-    if (heli.speed > 6){
-        heli.speed = 6;
-    } else if (heli.speed < -6){
-        heli.speed = -6;
-    }
-    // move heli by speed
-    heli.y += heli.speed;
-  }
-function moveWalls() {
-    wall1.x += wall1.speed
-    if (wall1.x + wall1.w <0){
-        wall1.x = wall3.x + 500;
-        wall1.y = Math.random() * 300 + 100;
-    }
-    wall2.x += wall1.speed
-    if (wall2.x + wall2.w <0){
-        wall2.x = wall1.x + 500;
-        wall2.y = Math.random() * 300 + 100;
-    }
-    wall3.x += wall1.speed
-    if (wall3.x + wall3.w <0){
-        wall3.x = wall2.x + 500;
-        wall3.y = Math.random() * 300 + 100;
-    }
-    wall1.speed += wall1.accel;
-    if (wall1.speed < -10){
-        wall1.speed = -10;
-    }
-}
-
+//game over code
 function checkCrash(){
     //hit top or bottom
-    if (heli.y < 50){
-        GameOver();
-    } else if (heli.y + heli.h > cnv.height - 50){
-        GameOver();
-    }
+    //if (heli.y < 50){
+    //    GameOver();
+
+}
 
     // hit walls
-    if (heli.x < wall1.x + wall1.w &&
-        heli.x + heli.w > wall1.x &&
-        heli.y < wall1.y + wall1.h &&
-        heli.h + heli.y > wall1.y) {
-        // collision detected
-        GameOver();
-    } else if (heli.x < wall2.x + wall2.w &&
-        heli.x + heli.w > wall2.x &&
-        heli.y < wall2.y + wall2.h &&
-        heli.h + heli.y > wall2.y) {
-        // collision detected
-        GameOver();
-    } else if (heli.x < wall3.x + wall3.w &&
-        heli.x + heli.w > wall3.x &&
-        heli.y < wall3.y + wall3.h &&
-        heli.h + heli.y > wall3.y) {
-        // collision detected
-        GameOver();
-    } 
-}
+//}
+/////////Game over code
 function GameOver(){
-    explosion.play();
     state = "gameover"
-
     setTimeout(reset, 2000);
 }
 
 
   function drawGame() {
     drawMain();
-  
     // Draw Walls
-    drawWalls();
   }
   
   // Draw Game Over Screen
@@ -112,15 +70,13 @@ function GameOver(){
     drawMain();
   
     // Draw Walls
-    
-    drawWalls();
   
     // Circle around Helicopter
-    ctx.strokeStyle = "red";
-    ctx.lineWidth = 5;
-    ctx.beginPath();
-    ctx.arc(heli.x + heli.w / 2, heli.y + heli.h / 2, 60, 0, 2 * Math.PI);
-    ctx.stroke();
+   // ctx.strokeStyle = "red";
+   // ctx.lineWidth = 5;
+   // ctx.beginPath();
+    //ctx.arc(heli.x + heli.w / 2, heli.y + heli.h / 2, 60, 0, 2 * Math.PI);
+   // ctx.stroke();
   
     // Game Over Text
     ctx.font = "40px Consolas";
@@ -130,48 +86,17 @@ function GameOver(){
 }
  //HELPER FUNCTIONS
  function reset(){
+     ctx.clearRect(0,0,cnv.width,cnv.height)
      state = "start";
-    heli = {
-        x: 200,
-        y: 250,
-        w: 80,
-        h: 40,
-        speed: 0,
-        accel: 0.75
-    }
-    wall1 = {
-    x: cnv.width,
-    y: Math.random() * 300 + 100,
-    w: 50,
-    h: 100,
-    speed: -3,
-    accel: -0.005
-    }
-    wall2 = {
-    x: cnv.width + 500,
-    y: Math.random() * 300 + 100,
-    w: 50,
-    h: 100
-    }
-    wall3 = {
-    x: cnv.width + 1000,
-    y: Math.random() * 300 + 100,
-    w: 50,
-    h: 100
-    }
-    distance = 0
+     bubbles = []
+     for (let n = 1; n < 15; n++){
+         bubbles.push(newRandomBubble());
+     }
+     score = 0
  }
- function drawWalls(){
-    ctx.fillStyle = "green";
-    ctx.fillRect(wall1.x, wall1.y, wall1.w, wall1.h);
-    ctx.fillRect(wall2.x, wall2.y, wall2.w, wall2.h);
-    ctx.fillRect(wall3.x, wall3.y, wall3.w, wall3.h);
-}
+//////////////////////////////////////////////////helper functions
 function drawMain(){
     // Background
-    ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, cnv.width, cnv.height);
-  
     // Green Bars
     ctx.fillStyle = "green";
     ctx.fillRect(0, 0, cnv.width, 50);
@@ -180,9 +105,85 @@ function drawMain(){
     // Green Bar Text
     ctx.font = "30px Consolas";
     ctx.fillStyle = "black";
-    ctx.fillText("HELICOPTER GAME", 25, 35);
-    ctx.fillText("DISTANCE: " + String(distance), 25, cnv.height - 15);
+    ctx.fillText("FRUITY NINJAS", 25, 35);
+    ctx.fillText("SCORE: " + String(score), 25, cnv.height - 15);
     ctx.fillText("BEST: " + String(best), cnv.width - 250, cnv.height - 15);
-    // Helicopter
-    ctx.drawImage(heliImg, heli.x, heli.y);
+}
+
+
+///FUNCtions FROM THE BUBBLE CODE
+function fill(color){
+    ctx.fillStyle = color;
+}
+function stroke(color){
+    ctx.strokeStyle = color;
+}
+function circle(x,y,r,mode){
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, 2 * Math.PI);
+    if (mode == "fill"){
+        ctx.fill();
+    }
+    else if (mode == "stroke"){
+        ctx.stroke();
+    }
+}
+function dist(x1, y1, x2, y2) {
+    return Math.hypot(x2 - x1, y2 - y1);
+}
+function drawBubble(aBubble){
+    stroke(aBubble.color);
+    circle(aBubble.x,aBubble.y,aBubble.r,"stroke");
+}
+function moveBubble(aBubble){
+    aBubble.speed += aBubble.accel;
+    if(aBubble.speed < -7){
+        aBubble.speed = -7
+    }
+    aBubble.y += aBubble.speed;
+    aBubble.x += aBubble.speedX;
+}
+function randomRGB() {
+    let r = randomInt(0,256);
+    let g = randomInt(0, 256);
+    let b = randomInt(0, 256);
+    return "rgb(" + r + ", " + g + ", " + b + ")";
+}
+function randomInt(low,high){
+    return Math.floor(Math.random() * (high -low) + low);
+}
+function newRandomBubble(){
+    return{
+        x: randomInt(0, cnv.width),
+        y:randomInt(0, cnv.height * 3/4),
+        r:randomInt(22,50),
+        color: randomRGB(),
+        speed: 0,
+        accel: 0.05,
+        speedX: randomInt(-1, 2)
+    };
+}
+document.addEventListener("mousemove", mousemoveHandler);
+function mousemoveHandler(event){
+    mouseX = event.clientX - cnv.offsetLeft;
+    mouseY = event.clientY -cnv.offsetTop;
+}
+function bubbleClicked(aBubble) {
+    if (dist(mouseX, mouseY, aBubble.x, aBubble.y) < aBubble.r && mouseIsPressed) {
+        aBubble.speed += -1
+        aBubble.y += aBubble.speed
+        aBubble.speedX = randomInt(-1,2)
+    }
+}
+document.addEventListener("mousedown", mousedownHandler);
+document.addEventListener("mouseup", mouseupHandler);
+
+function mousedownHandler() {
+    mouseIsPressed = true;
+    if (state == "start") {
+        state = "gameon"
+    }
+}
+function mouseupHandler() {
+    mouseIsPressed = false;
 }
