@@ -8,6 +8,14 @@ cnv.height = 600;
 
 
 // Global Variables (once)
+let explosion = document.createElement("audio");
+explosion.src = "sound/explosion.wav";
+let slice = document.createElement("audio");
+slice.src = "sound/slice.wav";
+let fruitImg = document.createElement("img")
+fruitImg.src = "img/fruitninja.png"
+
+
 let mouseIsPressed = false;
 let best = 0
 let score;
@@ -16,6 +24,11 @@ let score;
   let mouseX;
   let mouseY;
   let bubbles;
+  let redBubbles;
+  let t;
+  let t2;
+  let t3;
+  let t4;
  reset();
 
 // Draw Function
@@ -26,7 +39,6 @@ function draw() {
     drawStart();
   } else if ( state === "gameon"){
     runGame();
-    score += 1
   } else if (state === "gameover") {
     drawGameOver();
   }
